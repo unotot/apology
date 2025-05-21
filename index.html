@@ -24,11 +24,13 @@
       0 0 75px #ff1155,
       0 0 100px #ff3366;
     display: block;
+    max-width: 100%;
+    height: auto;
   }
   #notebook-container {
     position: absolute;
-    top: 40px;
-    left: 40px;
+    top: 5%;
+    left: 5%;
     z-index: 10;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
@@ -63,14 +65,14 @@
     z-index: 5;
   }
   #flip-notebook {
-    width: 500px;
-    height: 700px;
+    width: 90vw;
+    height: 70vh;
     perspective: 1200px;
     cursor: pointer;
   }
   .flip-notebook-face {
-    width: 500px;
-    height: 700px;
+    width: 100%;
+    height: 100%;
     position: absolute;
     top: 0;
     left: 0;
@@ -113,13 +115,24 @@
   #flip-notebook.flipped {
     transform: rotateY(180deg);
   }
+
+  @media (max-width: 768px) {
+    .notebook-text {
+      font-size: 1em;
+      padding: 20px 15px;
+    }
+    #flip-notebook {
+      width: 95vw;
+      height: 60vh;
+    }
+  }
 </style>
 </head>
 <body>
 <div id="flip-notebook-container">
   <div id="flip-notebook">
     <div class="flip-notebook-face flip-notebook-front">
-      <canvas id="rose" width="500" height="700"></canvas>
+      <canvas id="rose"></canvas>
     </div>
     <div class="flip-notebook-face flip-notebook-back">
       <div class="notebook-text">
@@ -132,19 +145,17 @@
 
 <div id="canvas-notebook-container">
   <div id="canvas-notebook-cover"></div>
-  <canvas id="rose" width="500" height="700" style="display:none;"></canvas>
+  <canvas id="rose" style="display:none;"></canvas>
 </div>
 
-
-  <div id="notebook-cover"></div>
-
+<div id="notebook-cover"></div>
 
 <script>
 (() => {
   const canvas = document.getElementById('rose');
   const ctx = canvas.getContext('2d');
-  const cw = canvas.width;
-  const ch = canvas.height;
+  const cw = canvas.width = canvas.offsetWidth;
+  const ch = canvas.height = canvas.offsetHeight;
 
   // Draw one rose petal
   function drawPetal(x, y, scale, rotation, glowAlpha) {
@@ -284,6 +295,12 @@
   const flipNotebook = document.getElementById('flip-notebook');
   flipNotebook.addEventListener('click', () => {
     flipNotebook.classList.toggle('flipped');
+  });
+
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
   });
 
 })();
