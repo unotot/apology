@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Apology</title>
 <style>
+  * {
+    box-sizing: border-box;
+  }
   body {
     margin: 0;
     background: #10000f;
@@ -12,10 +15,14 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    overflow: hidden;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
   }
+
   canvas {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
     background: radial-gradient(circle at center, #2a001f 0%, #10000f 90%);
     border-radius: 10px;
     box-shadow:
@@ -24,35 +31,8 @@
       0 0 75px #ff1155,
       0 0 100px #ff3366;
     display: block;
-    width: 100%;
-    height: auto;
-  }
-  #notebook-container {
-    position: absolute;
-    top: 5%;
-    left: 5%;
-    z-index: 10;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-  #notebook-cover:hover {
-    box-shadow: 0 8px 32px #0003;
-  }
-  @keyframes openNotebook {
-    from { opacity: 0; transform: scaleY(0.8); }
-    to { opacity: 1; transform: scaleY(1); }
-  }
-  #canvas-notebook-container {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 2;
   }
 
-  #canvas-notebook-cover:hover {
-    box-shadow: 0 8px 32px #0003;
-  }
   #flip-notebook-container {
     display: flex;
     justify-content: center;
@@ -63,13 +43,20 @@
     top: 0;
     left: 0;
     z-index: 5;
+    padding: 10px;
   }
+
   #flip-notebook {
     width: 90vw;
-    height: 70vh;
+    max-width: 500px;
+    aspect-ratio: 5 / 7;
     perspective: 1200px;
     cursor: pointer;
+    position: relative;
+    transition: transform 0.7s cubic-bezier(.4,2,.6,1);
+    transform-style: preserve-3d;
   }
+
   .flip-notebook-face {
     width: 100%;
     height: 100%;
@@ -84,13 +71,12 @@
       0 0 75px #ff1155,
       0 0 100px #ff3366;
   }
+
   .flip-notebook-front {
     background: radial-gradient(circle at center, #2a001f 0%, #10000f 90%);
     z-index: 2;
-    display: flex;
-    justify-content: center;
-    align-items: center;
   }
+
   .flip-notebook-back {
     background: radial-gradient(circle at center, #2a001f 0%, #10000f 90%);
     color: #fff;
@@ -100,37 +86,29 @@
     justify-content: center;
     z-index: 1;
   }
+
   .notebook-text {
     width: 90%;
     margin: 0 auto;
     border-radius: 8px;
-    padding: 32px 24px;
+    padding: 5vw;
     color: #fff;
-    font-size: 1.2em;
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
     box-shadow: 0 2px 12px #0004;
     text-align: center;
   }
-  #flip-notebook {
-    position: relative;
-    transition: transform 0.7s cubic-bezier(.4,2,.6,1);
-    transform-style: preserve-3d;
-  }
+
   #flip-notebook.flipped {
     transform: rotateY(180deg);
   }
 
-  @media (max-width: 768px) {
-    .notebook-text {
-      font-size: 1em;
-      padding: 20px 15px;
+  /* Optional: Adjust for ultra-small devices */
+  @media (max-width: 400px) {
+    .notebook-text h2 {
+      font-size: 1.2rem;
     }
-    #flip-notebook {
-      width: 95vw;
-      height: 60vh;
-    }
-    .flip-notebook-face canvas {
-      width: 100%;
-      height: auto;
+    .notebook-text p {
+      font-size: 1rem;
     }
   }
 </style>
@@ -139,145 +117,122 @@
 <div id="flip-notebook-container">
   <div id="flip-notebook">
     <div class="flip-notebook-face flip-notebook-front">
-      <canvas id="rose" width="1053"></canvas>
+      <canvas id="rose" width="500" height="700"></canvas>
     </div>
     <div class="flip-notebook-face flip-notebook-back">
       <div class="notebook-text">
-        <h2>To my broadcasting bebe</h2>
-        <p>Helu💥! It's me vine alam ko na I did something wrong to you and I also give u some mix signals. Sorry for everything na ginawa ko sayo from judging you and saying some shits to you.
-I know na wala me sa posisyon na pagsalitaan ka ng ganun or i-judge ka ng ganun since di naman tayo masyadong close. I am not also good sa wordings and sorry if di kita na uuna about sa kapit-bahay ko. Pero I can promise na walang namamagitan samin ng kapit-bahay ko.
-Pagaling na u sa sugat mo ha? I'll wait for you once na napatawad mo na ako and if you don't forgive me pa I understand it. I am very sorry sa mix signals. thank you!</p>
+        <h2>Dito and headings</h2>
+        <p>d2 and main text</p>
       </div>
     </div>
   </div>
 </div>
 
-<div id="canvas-notebook-container">
-  <div id="canvas-notebook-cover"></div>
-  <canvas id="rose" style="display:none;"></canvas>
-</div>
-
-<div id="notebook-cover"></div>
-
 <script>
 (() => {
   const canvas = document.getElementById('rose');
   const ctx = canvas.getContext('2d');
-  let cw = canvas.width;
-  let ch = canvas.height = canvas.offsetHeight;
 
-  // Draw one rose petal
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+  }
+
+  window.addEventListener('resize', () => {
+    resizeCanvas();
+    draw();
+  });
+
   function drawPetal(x, y, scale, rotation, glowAlpha) {
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(rotation);
     ctx.scale(scale, scale);
-
-    // Glowing outer petal
     let radialGrad = ctx.createRadialGradient(0, -20, 10, 0, -20, 60);
     radialGrad.addColorStop(0, `rgba(255, 0, 77, ${glowAlpha})`);
     radialGrad.addColorStop(1, 'rgba(255, 0, 77, 0)');
     ctx.fillStyle = radialGrad;
-
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.bezierCurveTo(25, -50, 35, -90, 0, -110);
     ctx.bezierCurveTo(-35, -90, -25, -50, 0, 0);
     ctx.closePath();
     ctx.fill();
-
-    // Inner petal detail
     const innerGrad = ctx.createLinearGradient(0, 0, 0, -110);
     innerGrad.addColorStop(0, 'rgba(255, 80, 120, 0.8)');
     innerGrad.addColorStop(1, 'rgba(255, 0, 50, 0.95)');
     ctx.fillStyle = innerGrad;
-
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.bezierCurveTo(15, -40, 20, -80, 0, -95);
     ctx.bezierCurveTo(-20, -80, -15, -40, 0, 0);
     ctx.closePath();
     ctx.fill();
-
     ctx.restore();
   }
 
-  // Draw stem
   function drawStem(){
+    const cw = canvas.width;
+    const ch = canvas.height;
     const grd = ctx.createLinearGradient(cw/2, ch/2, cw/2, ch);
     grd.addColorStop(0, '#134713');
     grd.addColorStop(1, '#041a04');
     ctx.fillStyle = grd;
-
     ctx.beginPath();
     ctx.moveTo(cw/2 - 12, ch/2 + 10);
     ctx.lineTo(cw/2 + 12, ch/2 + 10);
     ctx.lineTo(cw/2 + 20, ch);
     ctx.lineTo(cw/2 - 20, ch);
     ctx.closePath();
-    ctx.fill();
-
-    // glow
     ctx.shadowColor = 'rgba(0, 255, 60, 0.4)';
     ctx.shadowBlur = 18;
     ctx.fill();
     ctx.shadowBlur = 0;
   }
 
-  // Draw leaves
   function drawLeaf(x, y, scale, rotation) {
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(rotation);
     ctx.scale(scale, scale);
-
     const leafGradient = ctx.createLinearGradient(0, 0, 50, 80);
     leafGradient.addColorStop(0, '#1f4d1fdd');
     leafGradient.addColorStop(1, '#0a1f0a00');
-
     ctx.fillStyle = leafGradient;
-
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.quadraticCurveTo(60, 30, 15, 80);
     ctx.quadraticCurveTo(-40, 10, 0, 0);
     ctx.closePath();
     ctx.fill();
-
     ctx.restore();
   }
 
-  // Animate the rose hologram
   let frame = 0;
-
-  function animate() {
+  function draw() {
+    const cw = canvas.width;
+    const ch = canvas.height;
     frame++;
     ctx.clearRect(0, 0, cw, ch);
-
     drawStem();
     drawLeaf(cw/2 - 40, ch - 210, 1.3, -0.4);
     drawLeaf(cw/2 + 40, ch - 160, 1, 0.5);
-
     const glowAlpha = 0.3 + 0.3 * Math.sin(frame * 0.05);
-
-    // Draw petals rotating slightly
     const petalsCount = 8;
     for(let i = 0; i < petalsCount; i++) {
       const angle = (2 * Math.PI / petalsCount) * i + 0.1 * Math.sin(frame * 0.04 + i);
       drawPetal(cw/2, ch/2 + 60, 1, angle, glowAlpha);
     }
-
-    requestAnimationFrame(animate);
+    requestAnimationFrame(draw);
   }
 
-  animate();
+  resizeCanvas();
+  draw();
 
-  // Handle window resize
-  window.addEventListener('resize', () => {
-    cw = canvas.width;
-    ch = canvas.height = canvas.offsetHeight;
+  document.getElementById('flip-notebook').addEventListener('click', () => {
+    document.getElementById('flip-notebook').classList.toggle('flipped');
   });
-
 })();
 </script>
 </body>
