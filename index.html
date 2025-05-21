@@ -24,7 +24,7 @@
       0 0 75px #ff1155,
       0 0 100px #ff3366;
     display: block;
-    max-width: 100%;
+    width: 100%;
     height: auto;
   }
   #notebook-container {
@@ -125,6 +125,10 @@
       width: 95vw;
       height: 60vh;
     }
+    .flip-notebook-face canvas {
+      width: 100%;
+      height: 100%;
+    }
   }
 </style>
 </head>
@@ -137,8 +141,8 @@
     <div class="flip-notebook-face flip-notebook-back">
       <div class="notebook-text">
         <h2>To my broadcasting bebe</h2>
-        <p>Helu💥! It's me vine alam ko na I did something wrong to you and I also give u some mix signals. Sorry for everything na ginawa ko sayo from judging you and saying some shits to you. 
-I know na wala me sa posisyon na pagsalitaan ka ng ganun or i-judge ka ng ganun since di naman tayo masyadong close. I am not also good sa wordings and sorry if di kita na uuna about sa kapit-bahay ko. Pero I can promise na walang namamagitan samin ng kapit-bahay ko. 
+        <p>Helu💥! It's me vine alam ko na I did something wrong to you and I also give u some mix signals. Sorry for everything na ginawa ko sayo from judging you and saying some shits to you.
+I know na wala me sa posisyon na pagsalitaan ka ng ganun or i-judge ka ng ganun since di naman tayo masyadong close. I am not also good sa wordings and sorry if di kita na uuna about sa kapit-bahay ko. Pero I can promise na walang namamagitan samin ng kapit-bahay ko.
 Pagaling na u sa sugat mo ha? I'll wait for you once na napatawad mo na ako and if you don't forgive me pa I understand it. I am very sorry sa mix signals. thank you!</p>
       </div>
     </div>
@@ -156,8 +160,8 @@ Pagaling na u sa sugat mo ha? I'll wait for you once na napatawad mo na ako and 
 (() => {
   const canvas = document.getElementById('rose');
   const ctx = canvas.getContext('2d');
-  const cw = canvas.width = canvas.offsetWidth;
-  const ch = canvas.height = canvas.offsetHeight;
+  let cw = canvas.width = canvas.offsetWidth;
+  let ch = canvas.height = canvas.offsetHeight;
 
   // Draw one rose petal
   function drawPetal(x, y, scale, rotation, glowAlpha) {
@@ -265,44 +269,10 @@ Pagaling na u sa sugat mo ha? I'll wait for you once na napatawad mo na ako and 
 
   animate();
 
-  // Notebook/Folder open/close logic
-  const cover = document.getElementById('notebook-cover');
-  const content = document.getElementById('notebook-content');
-  cover.addEventListener('click', () => {
-    if (content.style.display === 'block') {
-      content.style.display = 'none';
-      cover.textContent = '';
-    } else {
-      content.style.display = 'block';
-      cover.textContent = '';
-    }
-  });
-
-  // Notebook/Folder open/close logic for Canvas
-  const canvasCover = document.getElementById('canvas-notebook-cover');
-  const roseCanvas = document.getElementById('rose');
-  let canvasOpen = false;
-  canvasCover.addEventListener('click', () => {
-    canvasOpen = !canvasOpen;
-    if (canvasOpen) {
-      roseCanvas.style.display = 'block';
-      canvasCover.textContent = '';
-    } else {
-      roseCanvas.style.display = 'none';
-      canvasCover.textContent = '';
-    }
-  });
-
-  // Flip notebook logic
-  const flipNotebook = document.getElementById('flip-notebook');
-  flipNotebook.addEventListener('click', () => {
-    flipNotebook.classList.toggle('flipped');
-  });
-
   // Handle window resize
   window.addEventListener('resize', () => {
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+    cw = canvas.width = canvas.offsetWidth;
+    ch = canvas.height = canvas.offsetHeight;
   });
 
 })();
